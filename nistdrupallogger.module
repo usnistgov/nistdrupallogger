@@ -1,0 +1,407 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function nistdrupallogger_menu(){
+
+  $items = array();
+
+  $items['admin/config/system/jfa_logger'] = array(
+    'title' => 'NIST Drupal Logger',
+    'description' => 'Configuration for the NIST Drupal Logger',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nistdrupallogger_logger_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback: NIST Drupal Logger settings
+ *
+ * @see nistdrupallogger_menu()
+ */
+function nistdrupallogger_logger_form($form, &$form_state) {
+
+  $form['jfa_logger_state'] = array(
+    '#type' => 'textfield',
+    '#title' => t( 'Aggressive' ),
+    '#default_value' => variable_get('nistdrupallogger_logger_state', 3),
+    '#size' => 2,
+    '#maxlength' => 2,
+    '#description' => t('Should the logger be aggressive? E.g.: should it log everything to be FIPS compliant?'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+
+
+
+/**
+ * Implements hook_init().
+ */
+/*
+function jfa_init() {
+  //dpm('jfa_init working on field update');
+}
+*/
+
+// ************************************* Menus *************************** //
+/**
+ * Implements hook_menu_link_delete()
+ */
+function nistdrupallogger_menu_link_delete( $link ){
+
+  logMenuAction($link, 'DELETED');
+}
+
+/**
+ * Implements hook_menu_link_insert()
+ */
+function nistdrupallogger_menu_link_insert( $link ){
+
+  logMenuAction($link, 'INSERTED');
+}
+
+/**
+ * Implements hook_menu_link_update()
+ */
+function nistdrupallogger_menu_link_update( $link ){
+
+  logMenuAction($link, 'UPDATED');
+}
+
+/**
+ * I log what menu has had an item change
+ * @param $link - I am the link array of information.
+ * @param $action - I am the action that was taken
+ * @return bool
+ */
+function logMenuAction($link, $action){
+
+  $message = 'The Menu: ' . $link['menu_name'] . ' link: '. $link['link_title'] . ' was ' . $action;
+
+  return writeLogMessage($message);
+}
+
+// ************************************* Fields **************************** //
+/**
+ * Implements hook_field_update_field().
+ */
+function nistdrupallogger_field_update_field( $field, $prior_field, $has_data ){
+
+  return logFieldAction( $field['field_name'],  'UPDATED' );
+}
+
+/**
+ * Implements hook_field_delete_field().
+ */
+function nistdrupallogger_field_delete_field( $field ){
+
+  return logFieldAction( $field['field_name'],  'DELETED' );
+}
+
+/**
+ * Implements hook_field_create_field().
+ */
+function nistdrupallogger_field_create_field( $field ){
+
+  return logFieldAction( $field['field_name'],  'CREATED' );
+}
+
+/**
+ * I log what action was taken on a field
+ * @param $fieldName - I am the name of the filed
+ * @param $action - I am what action took place
+ * @return bool - whether the log entry was put in the log file or not
+ */
+function logFieldAction($fieldName, $action){
+
+  $message = 'The Field: ' . $fieldName . ' was '. $action;
+
+  return writeLogMessage($message);
+}
+
+// ************************************* Modules *************************** //
+/**
+ * Implements hook_modules_enabled()
+ */
+function nistdrupallogger_modules_enabled( $modules ){
+
+  return logModuleAction($modules, "ENABLED");
+}
+
+/**
+ * Implements hook_modules_disabled()
+ */
+function nistdrupallogger_modules_disabled( $modules ){
+
+  return logModuleAction($modules, "DISABLED");
+}
+
+/**
+ * Implements hook_modules_installed()
+ */
+function nistdrupallogger_modules_installed( $modules ){
+
+  return logModuleAction($modules, "INSTALLED");
+}
+
+/**
+ * Implements hook_modules_uninstalled()
+ */
+function nistdrupallogger_modules_uninstalled($modules){
+
+  return logModuleAction($modules, "UNINSTALLED");
+}
+
+/**
+ * I log what action has been taken on a module
+ * @param $modules - I am the array of modules upon what action was taken
+ * @param $action - I am the action that was taken on the modules
+ * @return bool - true or false if I logged anything
+ */
+function logModuleAction( $modules, $action ){
+
+  if ( count( $modules ) > 1 ){
+
+    $message = 'The modules: "'. implode(',', $modules) .'" have been ' . strtoupper($action);
+
+  } else {
+
+    $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
+  }
+
+  return writeLogMessage($message);
+}
+
+// ************************************* Users ***************************** //
+/**
+ * Implements hook_user_delete()
+ */
+function nistdrupallogger_user_delete( $account ){
+  /*
+  $message = 'The User: ' . $account->name . ' was deleted.';
+  writeLogMessage($message);
+  */
+}
+
+/**
+ * Implements hook_user_insert()
+ */
+function nistdrupallogger_user_insert( $account ){
+  /*
+  $message = 'The User: ' . $account->name . ' was CREATED.';
+  writeLogMessage($message);
+  */
+}
+
+/**
+ * Implements hook_user_update()
+ */
+function nistdrupallogger_user_update( &$edit, $account, $category ){
+  /*
+  $message = 'The User: ' . $account->name . ' was UPDATED.';
+  writeLogMessage($message);
+  */
+}
+
+// ************************************* Roles ***************************** //
+/**
+ * Implements hook_user_role_delete()
+ */
+function nistdrupallogger_user_role_delete( $role ){
+
+  dpm('A User Role has been Deleted.');
+  dpm( $role );
+}
+
+/**
+ * Implements hook_user_role_insert()
+ */
+function nistdrupallogger_user_role_insert( $role ){
+
+  dpm('A User Role has been Deleted.');
+  dpm( $role );
+}
+
+/**
+ * Implements hook_user_role_update()
+ */
+function nistdrupallogger_user_role_update( $role ){
+
+  dpm('A User Role has been Updated.');
+  dpm( $role );
+}
+
+
+
+
+
+// ************************************* Login ***************************** //
+/*
+function jfa_form_user_login_block_alter(&$form, &$form_state) {
+
+  $form['#validate'][] = 'jfa_submit_function';
+}
+
+function jfa_submit_function(&$form, &$form_state){
+
+
+  if($form_state['uid'] == ''){
+    $message = 'FAILED LOGIN ATTEMPT! UN: ' . $form_state['input']['name'] . 'PASS: ' . $form_state['input']['pass'];
+    writeLogMessage($message);
+  }
+
+
+  dump($form_state['uid'] == '');
+  dump($form_state['input']['name']);
+  dump($form_state['input']['pass']);
+  dump($form_state);
+  exit;
+  dpm('Imma here');
+  dpm($form);
+}
+*/
+
+
+// *********************************** PRIVATE ****************************** //
+
+/**
+ * I write a log entry if syslog module is present and active, and if I was
+ * passed enough stuff to log. I return true if I logged and false if I did not.
+ *
+ * To log simple strings just writeLogMessage('im a string to log'). To customize
+ * the log message array object Drupal expects do something like
+ * $foo = getDefaultLogEntry(), then set the properties you desire then call
+ * writeLogMessage('', $foo);
+ *
+ * @param string $message - I am a string to write to the log.
+ * @param null $logEntry - I am an array that should be in the format Drupal expects.
+ * @return bool - I return true if I logged anything and false if I did not
+ */
+function writeLogMessage( $message = '', $logEntry = NULL ){
+
+  // use this to decide if we should log and also use as the return
+  $doLog = false;
+  // the final log entry array we will push to the syslog module
+  $entryForSysLog = '';
+
+  // are we getting a full log entry array? or just a message to log?
+  if ( isset( $logEntry ) ){
+
+    $entryForSysLog =  $logEntry;
+    $doLog = true;
+
+  } elseif ( strlen( $message ) ){ // just the message to log.
+
+    $entryForSysLog =  getDefaultLogEntry();
+    $entryForSysLog['message'] = $message;
+    $doLog = true;
+  }
+
+  if ( module_exists('syslog') && $doLog ) {
+
+    syslog_watchdog( $entryForSysLog );
+
+  } else {
+
+    // syslog is not configured or nothing was passed so lets not lie.
+    $doLog = false;
+  }
+
+  /*
+  dpm('did we log?!??');
+
+  if ($doLog){
+    dpm('WE LOGGGY!!!');
+  } else {
+    dpm('NO LOGGY...');
+  }
+  */
+
+  return $doLog;
+}
+
+/**
+ * I return an object with all the default keys to use with the syslog module
+ * @return array
+ */
+function getDefaultLogEntry(){
+
+  /*
+    type: The type of message for this entry.
+    user: The user object for the user who was logged in when the event happened.
+    uid: The user ID for the user who was logged in when the event happened.
+    request_uri: The request URI for the page the event happened in.
+    referer: The page that referred the user to the page where the event occurred.
+    ip: The IP address where the request for the page came from.
+    timestamp: The UNIX timestamp of the date/time the event occurred.
+    severity: The severity of the message; one of the following values as defined in RFC 3164:
+    link: An optional link provided by the module that called the watchdog() function.
+    message: The text of the message to be logged. Variables in the message are indicated by using placeholder strings alongside the variables argument to declare the value of the placeholders. See t() for documentation on how the message and variable parameters interact.
+    variables: An array of variables to be inserted into the message on display. Will be NULL or missing if a message is already translated or if the message is not possible to tra
+  */
+
+  /* RFC codes
+     0             kernel messages
+     1             user-level messages
+     2             mail system
+     3             system daemons
+     4             security/authorization messages (note 1)
+     5             messages generated internally by syslogd
+     6             line printer subsystem
+     7             network news subsystem
+     8             UUCP subsystem
+     9             clock daemon (note 2)
+    10             security/authorization messages (note 1)
+    11             FTP daemon
+    12             NTP subsystem
+    13             log audit (note 1)
+    14             log alert (note 1)
+    15             clock daemon (note 2)
+    16             local use 0  (local0)
+    17             local use 1  (local1)
+    18             local use 2  (local2)
+    19             local use 3  (local3)
+    20             local use 4  (local4)
+    21             local use 5  (local5)
+    22             local use 6  (local6)
+    23             local use 7  (local7)
+   */
+
+  global $user;
+
+  $loggerName = 'NIST Logger';
+
+  return array(
+    'type' => 'drupal',
+    'user' => $user,
+    'uid' => $user->uid,
+    'request_uri' => $_SERVER['REMOTE_ADDR'] . request_uri(),
+    'referer' => drupal_get_destination()['destination'],
+    'ip' => $_SERVER['REMOTE_ADDR'],
+    'timestamp' => time(),
+    'severity' => 4,
+    'link' => '',
+    'message' => 'NOTHING PASSED',
+    'variables' => array(
+      'logOrigin' => $loggerName
+    )
+  );
+}
+
+
+/**
+ * @param $value
+ */
+function doDump($value){
+  print '<pre><code>';
+  print_r($value);
+  print '</code></pre>';
+}
