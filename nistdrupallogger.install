@@ -1,16 +1,15 @@
 <?php
+/**
+ * @file
+ * Install, update and uninstall functions for the NIST Drupal Logger.
+ */
 
 /**
 * Implementation of hook_install().
 */
-function nistdrupallogger_install() {
-  //jfa_execute_install_code();
-}
+function nistdrupallogger_install() {}
 
 /**
  * jfa_execute_install_code
  */
-function nistdrupallogger_execute_install_code(){
-  //module_disable( array( 'dblog' ) );
-  //module_enable( array( 'syslog' ) );
-}
+function nistdrupallogger_execute_install_code(){}

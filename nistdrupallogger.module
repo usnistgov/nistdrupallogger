@@ -1,4 +1,13 @@
 <?php
+/**
+ * @file
+ * Module file for the NIST Drupal Logger.
+ */
+
+// define the field and variable names
+define('NIST_DRUPAL_LOGGER_MENU_FIELD_NAME', 'nistdrupallogger_menu_field');
+define('NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME', 'nistdrupallogger_field_field');
+define('NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME', 'nistdrupallogger_module_field');
 
 /**
  * Implements hook_menu().
@@ -26,36 +35,36 @@ function nistdrupallogger_menu(){
  */
 function nistdrupallogger_logger_form($form, &$form_state) {
 
-  $form['jfa_logger_state'] = array(
-    '#type' => 'textfield',
-    '#title' => t( 'Aggressive' ),
-    '#default_value' => variable_get('nistdrupallogger_logger_state', 3),
-    '#size' => 2,
-    '#maxlength' => 2,
-    '#description' => t('Should the logger be aggressive? E.g.: should it log everything to be FIPS compliant?'),
-    '#required' => TRUE,
+
+  $form[NIST_DRUPAL_LOGGER_MENU_FIELD_NAME] = array(
+    '#type' => 'checkbox',
+    '#title' => t( 'Log Menu Changes' ),
+    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME, 1),
+    '#required' => false,
+  );
+
+  $form[NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME] = array(
+    '#type' => 'checkbox',
+    '#title' => t( 'Log Field Changes' ),
+    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME, 1),
+    '#required' => false,
+  );
+
+  $form[NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME] = array(
+    '#type' => 'checkbox',
+    '#title' => t( 'Log Module Changes' ),
+    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME, 1),
+    '#required' => false,
   );
 
   return system_settings_form($form);
 }
 
-
-
-
-/**
- * Implements hook_init().
- */
-/*
-function jfa_init() {
-  //dpm('jfa_init working on field update');
-}
-*/
-
 // ************************************* Menus *************************** //
 /**
  * Implements hook_menu_link_delete()
  */
-function nistdrupallogger_menu_link_delete( $link ){
+function nistdrupallogger_menu_link_delete($link){
 
   logMenuAction($link, 'DELETED');
 }
@@ -63,7 +72,7 @@ function nistdrupallogger_menu_link_delete( $link ){
 /**
  * Implements hook_menu_link_insert()
  */
-function nistdrupallogger_menu_link_insert( $link ){
+function nistdrupallogger_menu_link_insert($link){
 
   logMenuAction($link, 'INSERTED');
 }
@@ -71,7 +80,7 @@ function nistdrupallogger_menu_link_insert( $link ){
 /**
  * Implements hook_menu_link_update()
  */
-function nistdrupallogger_menu_link_update( $link ){
+function nistdrupallogger_menu_link_update($link){
 
   logMenuAction($link, 'UPDATED');
 }
@@ -84,34 +93,37 @@ function nistdrupallogger_menu_link_update( $link ){
  */
 function logMenuAction($link, $action){
 
-  $message = 'The Menu: ' . $link['menu_name'] . ' link: '. $link['link_title'] . ' was ' . $action;
+  if(variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME) === 1) {
 
-  return writeLogMessage($message);
+    $message = 'The Menu: ' . $link['menu_name'] . ' link: '. $link['link_title'] . ' was ' . $action;
+
+    return writeLogMessage($message);
+  }
 }
 
 // ************************************* Fields **************************** //
 /**
  * Implements hook_field_update_field().
  */
-function nistdrupallogger_field_update_field( $field, $prior_field, $has_data ){
+function nistdrupallogger_field_update_field($field, $prior_field, $has_data){
 
-  return logFieldAction( $field['field_name'],  'UPDATED' );
+  return logFieldAction($field['field_name'], 'UPDATED');
 }
 
 /**
  * Implements hook_field_delete_field().
  */
-function nistdrupallogger_field_delete_field( $field ){
+function nistdrupallogger_field_delete_field($field){
 
-  return logFieldAction( $field['field_name'],  'DELETED' );
+  return logFieldAction($field['field_name'], 'DELETED');
 }
 
 /**
  * Implements hook_field_create_field().
  */
-function nistdrupallogger_field_create_field( $field ){
+function nistdrupallogger_field_create_field($field){
 
-  return logFieldAction( $field['field_name'],  'CREATED' );
+  return logFieldAction($field['field_name'], 'CREATED');
 }
 
 /**
@@ -122,16 +134,19 @@ function nistdrupallogger_field_create_field( $field ){
  */
 function logFieldAction($fieldName, $action){
 
-  $message = 'The Field: ' . $fieldName . ' was '. $action;
+  if(variable_get(NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME) === 1){
 
-  return writeLogMessage($message);
+    $message = 'The Field: ' . $fieldName . ' was '. $action;
+
+    return writeLogMessage($message);
+  }
 }
 
 // ************************************* Modules *************************** //
 /**
  * Implements hook_modules_enabled()
  */
-function nistdrupallogger_modules_enabled( $modules ){
+function nistdrupallogger_modules_enabled($modules){
 
   return logModuleAction($modules, "ENABLED");
 }
@@ -139,7 +154,7 @@ function nistdrupallogger_modules_enabled( $modules ){
 /**
  * Implements hook_modules_disabled()
  */
-function nistdrupallogger_modules_disabled( $modules ){
+function nistdrupallogger_modules_disabled($modules){
 
   return logModuleAction($modules, "DISABLED");
 }
@@ -147,7 +162,7 @@ function nistdrupallogger_modules_disabled( $modules ){
 /**
  * Implements hook_modules_installed()
  */
-function nistdrupallogger_modules_installed( $modules ){
+function nistdrupallogger_modules_installed($modules){
 
   return logModuleAction($modules, "INSTALLED");
 }
@@ -166,25 +181,28 @@ function nistdrupallogger_modules_uninstalled($modules){
  * @param $action - I am the action that was taken on the modules
  * @return bool - true or false if I logged anything
  */
-function logModuleAction( $modules, $action ){
+function logModuleAction($modules, $action){
 
-  if ( count( $modules ) > 1 ){
+  if (variable_get(NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME) === 1){
 
-    $message = 'The modules: "'. implode(',', $modules) .'" have been ' . strtoupper($action);
+    if (count($modules) > 1){
 
-  } else {
+      $message = 'The modules: "'. implode(',', $modules) .'" have been ' . strtoupper($action);
 
-    $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
+    } else {
+
+      $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
+    }
+
+    return writeLogMessage($message);
   }
-
-  return writeLogMessage($message);
 }
 
 // ************************************* Users ***************************** //
 /**
  * Implements hook_user_delete()
  */
-function nistdrupallogger_user_delete( $account ){
+function nistdrupallogger_user_delete($account){
   /*
   $message = 'The User: ' . $account->name . ' was deleted.';
   writeLogMessage($message);
@@ -194,7 +212,7 @@ function nistdrupallogger_user_delete( $account ){
 /**
  * Implements hook_user_insert()
  */
-function nistdrupallogger_user_insert( $account ){
+function nistdrupallogger_user_insert($account){
   /*
   $message = 'The User: ' . $account->name . ' was CREATED.';
   writeLogMessage($message);
@@ -204,7 +222,7 @@ function nistdrupallogger_user_insert( $account ){
 /**
  * Implements hook_user_update()
  */
-function nistdrupallogger_user_update( &$edit, $account, $category ){
+function nistdrupallogger_user_update(&$edit, $account, $category){
   /*
   $message = 'The User: ' . $account->name . ' was UPDATED.';
   writeLogMessage($message);
@@ -215,60 +233,29 @@ function nistdrupallogger_user_update( &$edit, $account, $category ){
 /**
  * Implements hook_user_role_delete()
  */
-function nistdrupallogger_user_role_delete( $role ){
+function nistdrupallogger_user_role_delete($role){
 
-  dpm('A User Role has been Deleted.');
-  dpm( $role );
+  //dpm('A User Role has been Deleted.');
+  //dpm( $role );
 }
 
 /**
  * Implements hook_user_role_insert()
  */
-function nistdrupallogger_user_role_insert( $role ){
+function nistdrupallogger_user_role_insert($role){
 
-  dpm('A User Role has been Deleted.');
-  dpm( $role );
+  //dpm('A User Role has been Deleted.');
+  //dpm( $role );
 }
 
 /**
  * Implements hook_user_role_update()
  */
-function nistdrupallogger_user_role_update( $role ){
+function nistdrupallogger_user_role_update($role){
 
-  dpm('A User Role has been Updated.');
-  dpm( $role );
+  //dpm('A User Role has been Updated.');
+  //dpm( $role );
 }
-
-
-
-
-
-// ************************************* Login ***************************** //
-/*
-function jfa_form_user_login_block_alter(&$form, &$form_state) {
-
-  $form['#validate'][] = 'jfa_submit_function';
-}
-
-function jfa_submit_function(&$form, &$form_state){
-
-
-  if($form_state['uid'] == ''){
-    $message = 'FAILED LOGIN ATTEMPT! UN: ' . $form_state['input']['name'] . 'PASS: ' . $form_state['input']['pass'];
-    writeLogMessage($message);
-  }
-
-
-  dump($form_state['uid'] == '');
-  dump($form_state['input']['name']);
-  dump($form_state['input']['pass']);
-  dump($form_state);
-  exit;
-  dpm('Imma here');
-  dpm($form);
-}
-*/
-
 
 // *********************************** PRIVATE ****************************** //
 
@@ -285,7 +272,7 @@ function jfa_submit_function(&$form, &$form_state){
  * @param null $logEntry - I am an array that should be in the format Drupal expects.
  * @return bool - I return true if I logged anything and false if I did not
  */
-function writeLogMessage( $message = '', $logEntry = NULL ){
+function writeLogMessage($message = '', $logEntry = NULL){
 
   // use this to decide if we should log and also use as the return
   $doLog = false;
@@ -293,37 +280,27 @@ function writeLogMessage( $message = '', $logEntry = NULL ){
   $entryForSysLog = '';
 
   // are we getting a full log entry array? or just a message to log?
-  if ( isset( $logEntry ) ){
+  if (isset($logEntry)){
 
     $entryForSysLog =  $logEntry;
     $doLog = true;
 
-  } elseif ( strlen( $message ) ){ // just the message to log.
+  } elseif (strlen($message)){ // just the message to log.
 
-    $entryForSysLog =  getDefaultLogEntry();
+    $entryForSysLog = getDefaultLogEntry();
     $entryForSysLog['message'] = $message;
     $doLog = true;
   }
 
-  if ( module_exists('syslog') && $doLog ) {
+  if (module_exists('syslog') && $doLog) {
 
-    syslog_watchdog( $entryForSysLog );
+    syslog_watchdog($entryForSysLog);
 
   } else {
 
     // syslog is not configured or nothing was passed so lets not lie.
     $doLog = false;
   }
-
-  /*
-  dpm('did we log?!??');
-
-  if ($doLog){
-    dpm('WE LOGGGY!!!');
-  } else {
-    dpm('NO LOGGY...');
-  }
-  */
 
   return $doLog;
 }
@@ -377,7 +354,7 @@ function getDefaultLogEntry(){
 
   global $user;
 
-  $loggerName = 'NIST Logger';
+  $loggerName = 'NIST Drupal Logger';
 
   return array(
     'type' => 'drupal',
