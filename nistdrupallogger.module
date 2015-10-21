@@ -16,7 +16,7 @@ function nistdrupallogger_menu(){
 
   $items = array();
 
-  $items['admin/config/system/jfa_logger'] = array(
+  $items['admin/config/system/nistdrupallogger_logger'] = array(
     'title' => 'NIST Drupal Logger',
     'description' => 'Configuration for the NIST Drupal Logger',
     'page callback' => 'drupal_get_form',
@@ -356,12 +356,14 @@ function getDefaultLogEntry(){
 
   $loggerName = 'NIST Drupal Logger';
 
+  $drupalDestinationObject = drupal_get_destination();
+
   return array(
     'type' => 'drupal',
     'user' => $user,
     'uid' => $user->uid,
     'request_uri' => $_SERVER['REMOTE_ADDR'] . request_uri(),
-    'referer' => drupal_get_destination()['destination'],
+    'referer' => $drupalDestinationObject['destination'],
     'ip' => $_SERVER['REMOTE_ADDR'],
     'timestamp' => time(),
     'severity' => 4,
@@ -373,9 +375,9 @@ function getDefaultLogEntry(){
   );
 }
 
-
 /**
- * @param $value
+ * I dump a value for debugging.
+ * @param $value - I am the value to dump.
  */
 function doDump($value){
   print '<pre><code>';

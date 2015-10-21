@@ -7,9 +7,12 @@
 /**
 * Implementation of hook_install().
 */
-function nistdrupallogger_install() {}
+function nistdrupallogger_install() {
+
+  //nistdrupallogger_execute_install_code();
+}
 
 /**
- * jfa_execute_install_code
+ * nistdrupallogger_execute_install_code
  */
 function nistdrupallogger_execute_install_code(){}
