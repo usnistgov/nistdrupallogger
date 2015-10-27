@@ -9,6 +9,14 @@ define('NIST_DRUPAL_LOGGER_MENU_FIELD_NAME', 'nistdrupallogger_menu_field');
 define('NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME', 'nistdrupallogger_field_field');
 define('NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME', 'nistdrupallogger_module_field');
 
+/*
+function nistdrupallogger_init(){
+  //dpm( 'is syslog there???' . (bool) module_exists('syslog'));
+}
+*/
+
+
+
 /**
  * Implements hook_menu().
  */
@@ -64,25 +72,49 @@ function nistdrupallogger_logger_form($form, &$form_state) {
 /**
  * Implements hook_menu_link_delete()
  */
-function nistdrupallogger_menu_link_delete($link){
+function nistdrupallogger_menu_link_delete( $link = NULL ){
 
-  logMenuAction($link, 'DELETED');
+  if ( is_array($link) ){
+
+    return logMenuAction($link, 'DELETED');
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO DELETE A LINK WITH A MALFORMED ARGUMENT.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_menu_link_insert()
  */
-function nistdrupallogger_menu_link_insert($link){
+function nistdrupallogger_menu_link_insert($link = NULL){
 
-  logMenuAction($link, 'INSERTED');
+  if ( is_array( $link ) ) {
+
+    return logMenuAction( $link, 'INSERTED' );
+
+  }else{
+
+    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO INSERT A LINK WITH A MALFORMED ARGUMENT.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_menu_link_update()
  */
-function nistdrupallogger_menu_link_update($link){
+function nistdrupallogger_menu_link_update($link = NULL){
 
-  logMenuAction($link, 'UPDATED');
+  if ( is_array( $link ) ) {
+
+    return logMenuAction($link, 'UPDATED');
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO UPDATE A LINK WITH A MALFORMED ARGUMENT.");
+    return false;
+  }
 }
 
 /**
@@ -93,37 +125,66 @@ function nistdrupallogger_menu_link_update($link){
  */
 function logMenuAction($link, $action){
 
-  if(variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME) === 1) {
+  if(variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME) === 1 ) {
 
     $message = 'The Menu: ' . $link['menu_name'] . ' link: '. $link['link_title'] . ' was ' . $action;
-
     return writeLogMessage($message);
+
+  } else {
+
+    return false;
   }
+
 }
 
 // ************************************* Fields **************************** //
 /**
  * Implements hook_field_update_field().
  */
-function nistdrupallogger_field_update_field($field, $prior_field, $has_data){
+function nistdrupallogger_field_update_field( $field = NULL, $prior_field = NULL, $has_data = NULL){
 
-  return logFieldAction($field['field_name'], 'UPDATED');
+  if ( is_array($field) ){
+
+    return logFieldAction($field['field_name'], 'UPDATED');
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to update a field with malformed arguments.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_field_delete_field().
  */
-function nistdrupallogger_field_delete_field($field){
+function nistdrupallogger_field_delete_field( $field = NULL ){
 
-  return logFieldAction($field['field_name'], 'DELETED');
+
+  if ( is_array($field) ) {
+
+    return logFieldAction($field['field_name'], 'DELETED');
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to delete a field with malformed arguments.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_field_create_field().
  */
-function nistdrupallogger_field_create_field($field){
+function nistdrupallogger_field_create_field( $field = NULL ){
 
-  return logFieldAction($field['field_name'], 'CREATED');
+  if ( is_array($field) ) {
+
+    return logFieldAction($field['field_name'], 'CREATED');
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to create a field with malformed arguments.");
+    return false;
+  }
 }
 
 /**
@@ -139,6 +200,9 @@ function logFieldAction($fieldName, $action){
     $message = 'The Field: ' . $fieldName . ' was '. $action;
 
     return writeLogMessage($message);
+  } else {
+
+    return false;
   }
 }
 
@@ -146,33 +210,66 @@ function logFieldAction($fieldName, $action){
 /**
  * Implements hook_modules_enabled()
  */
-function nistdrupallogger_modules_enabled($modules){
+function nistdrupallogger_modules_enabled($modules = NULL){
 
-  return logModuleAction($modules, "ENABLED");
+  if (is_array($modules)){
+
+    return logModuleAction($modules, "ENABLED");
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Failed enable modules because malformed arguments.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_modules_disabled()
  */
-function nistdrupallogger_modules_disabled($modules){
+function nistdrupallogger_modules_disabled($modules = NULL){
 
-  return logModuleAction($modules, "DISABLED");
+  if ( is_array($modules) ){
+
+    return logModuleAction($modules, "DISABLED");
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Failed Disabled modules because malformed arguments.");
+    return false;
+  }
+
 }
 
 /**
  * Implements hook_modules_installed()
  */
-function nistdrupallogger_modules_installed($modules){
+function nistdrupallogger_modules_installed($modules = NULL){
 
-  return logModuleAction($modules, "INSTALLED");
+  if ( is_array($modules) ) {
+
+    return logModuleAction($modules, "INSTALLED");
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Failed Install modules because malformed arguments.");
+    return false;
+  }
 }
 
 /**
  * Implements hook_modules_uninstalled()
  */
-function nistdrupallogger_modules_uninstalled($modules){
+function nistdrupallogger_modules_uninstalled($modules = NULL){
 
-  return logModuleAction($modules, "UNINSTALLED");
+  if ( is_array($modules) ) {
+
+    return logModuleAction($modules, "UNINSTALLED");
+
+  } else {
+
+    writeLogMessage("NIST DRUPAL LOGGER. Failed Uninstall modules a field malformed arguments.");
+    return false;
+  }
 }
 
 /**
@@ -182,6 +279,8 @@ function nistdrupallogger_modules_uninstalled($modules){
  * @return bool - true or false if I logged anything
  */
 function logModuleAction($modules, $action){
+
+  $message = 'Nothing was logged. NISTDrupalLogger logModuleAction() method.';
 
   if (variable_get(NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME) === 1){
 
@@ -193,9 +292,9 @@ function logModuleAction($modules, $action){
 
       $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
     }
-
-    return writeLogMessage($message);
   }
+
+  return writeLogMessage($message);
 }
 
 // ************************************* Users ***************************** //
@@ -292,9 +391,10 @@ function writeLogMessage($message = '', $logEntry = NULL){
     $doLog = true;
   }
 
-  if (module_exists('syslog') && $doLog) {
+  if ( (bool) module_exists('syslog') && $doLog) {
 
     syslog_watchdog($entryForSysLog);
+    $doLog = true;
 
   } else {
 

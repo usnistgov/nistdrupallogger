@@ -1,0 +1,193 @@
+<?php
+class NISTDrupalLoggerTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'NISTDrupalLogger unit tests',
+      'description' => 'Test that nistdrupallogger_menu works properly.',
+      'group' => 'NIST Drupal Logger'
+    );
+
+  }
+
+  /**
+   * I set up the class to be used for testing.
+   */
+  function setUp() {
+
+    // inject dependencies
+    parent::setUp('nistdrupallogger', 'syslog');
+
+    // set the environment variables we will need in the module
+    variable_set('nistdrupallogger_menu_field', 1);
+    variable_set('nistdrupallogger_field_field', 1);
+    variable_set('nistdrupallogger_module_field', 1);
+  }
+
+  // MENU Delete
+  public function testNistDrupalLoggerMenuLinkDelete() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_delete( $link );
+    $message = 'Menu Link DELETE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkDeleteFail() {
+
+    $result = nistdrupallogger_menu_link_delete();
+    $message = 'Menu Link DELETE FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+  // MENU Insert
+  public function testNistDrupalLoggerMenuLinkInsert() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_insert( $link );
+    $message = 'Menu Link INSERT. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkInsertFail() {
+
+    $result = nistdrupallogger_menu_link_insert();
+    $message = 'Menu link INSERT FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+  // MENU Update
+  public function testNistDrupalLoggerMenuLinkUpdate() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_update( $link );
+    $message = 'Menu link UPDATE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkUpdateFail() {
+
+    $result = nistdrupallogger_menu_link_update();
+    $message = 'Menu link UPDATE FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+  // *********************************
+  // FIELD Update
+  public function testNistDrupalLoggerFieldUpdate() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_update_field( $field );
+    $message = 'Field UPDATE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldUpdateFail() {
+
+    $result = nistdrupallogger_field_update_field();
+    $message = 'Field UPDATE Field FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+
+  //FIELD Delete
+  public function testNistDrupalLoggerFieldDelete() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_delete_field( $field );
+    $message = 'Field DELETE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldDeleteFail() {
+
+    $result = nistdrupallogger_field_delete_field();
+    $message = 'Field DELETE Field FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+  // FIELD Create
+  //FIELD Delete
+  public function testNistDrupalLoggerFieldCreate() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_create_field( $field );
+    $message = 'Field CREATE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldCreateFail() {
+
+    $result = nistdrupallogger_field_create_field();
+    $message = 'Field CREATE Field FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+
+  // *********************************
+  // MODULE enabled
+  public function testNistDrupalLoggerModuleEnabled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_enabled( $module );
+    $message = 'Module ENABLE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleEnabledFail() {
+
+    $result = nistdrupallogger_modules_enabled();
+    $message = 'Module ENABLE FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+
+  public function testNistDrupalLoggerModuleDisable() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_disabled( $module );
+    $message = 'Module DISABLE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleDisableFail() {
+
+    $result = nistdrupallogger_modules_disabled();
+    $message = 'Module DISABLE FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+
+
+
+  public function testNistDrupalLoggerModuleInstalled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_installed( $module );
+    $message = 'Module INSTALLED. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleInstalledFail() {
+
+    $result = nistdrupallogger_modules_installed();
+    $message = 'Module INSTALLED FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+
+
+
+  public function testNistDrupalLoggerModuleUninstalled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_uninstalled( $module );
+    $message = 'Module UNINSTALLED. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleUninstalledFail() {
+
+    $result = nistdrupallogger_modules_uninstalled();
+    $message = 'Module UNINSTALLED FAIL. I should return FALSE.';
+    $this->assertFalse($result, $message);
+  }
+}
