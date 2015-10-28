@@ -1,11 +1,10 @@
 name = NIST Drupal Logger
 description = I am a logger module for Drupal which adds functionality to meet FIPS logging requirements.
 package = Settings API
-version = 2.0
+version = 1.0
 core = 7.x
 php = 5.2
 files[] = nistdrupallogger.module
-files[] = nistdrupallogger.install
 files[] = tests/NISTDrupalLoggerMenuTestCase.test
 files[] = tests/NISTDrupalLoggerFieldTestCase.test
 files[] = tests/NISTDrupalLoggerModuleTestCase.test
