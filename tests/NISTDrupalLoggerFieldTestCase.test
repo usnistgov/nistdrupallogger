@@ -1,0 +1,85 @@
+<?php
+class NISTDrupalLoggerFieldTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'NISTDrupalLogger Field Unit Tests',
+      'description' => 'Test that nistdrupallogger field functions are logging and reporting properly.',
+      'group' => 'NIST Drupal Logger'
+    );
+
+  }
+
+  /**
+   * I set up the class to be used for testing.
+   */
+  function setUp() {
+    // inject dependencies
+    parent::setUp('nistdrupallogger', 'syslog');
+  }
+
+  // FIELD Update
+  public function testNistDrupalLoggerFieldUpdate() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_update_field( $field );
+    $message = 'Field UPDATE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldUpdateFailBadArguments() {
+    $field = array(
+      'field_is_foo' => ''
+    );
+    $result = nistdrupallogger_field_update_field( $field );
+    $message = 'Field UPDATE Field. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerFieldUpdateFailNoArguments() {
+    $result = nistdrupallogger_field_update_field();
+    $message = 'Field UPDATE Field FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  //FIELD Delete
+  public function testNistDrupalLoggerFieldDelete() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_delete_field( $field );
+    $message = 'Field DELETE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldDeleteFailBadArguments() {
+    $argument = 'stringAndShouldFail!';
+    $result = nistdrupallogger_field_delete_field($argument);
+    $message = 'Field DELETE Field FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerFieldDeleteFailNoArguments() {
+    $result = nistdrupallogger_field_delete_field();
+    $message = 'Field DELETE Field FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  //FIELD Create
+  public function testNistDrupalLoggerFieldCreate() {
+    $field = array(
+      'field_name' => 'NIST DRUPAL LOGGER TEST DATA'
+    );
+    $result = nistdrupallogger_field_create_field( $field );
+    $message = 'Field CREATE Field. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerFieldCreateFailBadArguments() {
+    $argument = true;
+    $result = nistdrupallogger_field_create_field($argument);
+    $message = 'Field CREATE Field FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerFieldCreateFailNoArguments() {
+    $result = nistdrupallogger_field_create_field();
+    $message = 'Field CREATE Field FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+}

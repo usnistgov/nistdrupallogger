@@ -2,12 +2,40 @@
 /**
  * @file
  * Module file for the NIST Drupal Logger.
+ *
+ * Requirements are derived from:
+ * https://connection.commerce.gov/sites/connection.commerce.gov/files/2014_doc_itspp.pdf.
+ * See section 4.5 (starting on page 38) of the DoC IT Security Program Policy
+ * (ITSPP)
+ *
+ * Propose:
+ * Drupals' base line logging covers most of the FIPS requirements, failed login
+ * attempts, role changes, user deletions, user creation, content submission,
+ * critical errors and Apache covers the web server errors. What was missing was
+ * 1. content changes to menu's
+ * 2. changes to fields
+ * 3. changes to modules
+ * those have been incorporated into this logger.
+ *
+ * Usage:
+ * This module should be implemented using syslog. No other configuration is
+ * required.
+ *
+ * History:
+ * We removed configuration items for a couple of reasons
+ * 1. We desired to just create a module that was set-it-and-forget-it
+ * 2. If we used configuration we would have to hit the db for the values and
+ *    we desired to have the logger be as light weight as possible
  */
 
+/* Old configuration options - NOT used any more
 // define the field and variable names
 define('NIST_DRUPAL_LOGGER_MENU_FIELD_NAME', 'nistdrupallogger_menu_field');
 define('NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME', 'nistdrupallogger_field_field');
 define('NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME', 'nistdrupallogger_module_field');
+*/
+
+define('NISTDrupalLoggerWarningPrefix', 'NISTDRUPALLOGGER Warning!!');
 
 /*
 function nistdrupallogger_init(){
@@ -15,11 +43,11 @@ function nistdrupallogger_init(){
 }
 */
 
-
-
 /**
  * Implements hook_menu().
+ * Not used anymore will be removed in future release
  */
+/*
 function nistdrupallogger_menu(){
 
   $items = array();
@@ -35,54 +63,51 @@ function nistdrupallogger_menu(){
 
   return $items;
 }
+*/
 
 /**
  * Page callback: NIST Drupal Logger settings
  *
  * @see nistdrupallogger_menu()
+ *
+ * Not used anymore. Will be removed in future release. K
  */
+/*
 function nistdrupallogger_logger_form($form, &$form_state) {
-
 
   $form[NIST_DRUPAL_LOGGER_MENU_FIELD_NAME] = array(
     '#type' => 'checkbox',
     '#title' => t( 'Log Menu Changes' ),
-    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME, 1),
+    '#default_value' => 0,
     '#required' => false,
   );
 
   $form[NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME] = array(
     '#type' => 'checkbox',
     '#title' => t( 'Log Field Changes' ),
-    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME, 1),
+    '#default_value' => 0,
     '#required' => false,
   );
 
   $form[NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME] = array(
     '#type' => 'checkbox',
     '#title' => t( 'Log Module Changes' ),
-    '#default_value' => variable_get(NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME, 1),
+    '#default_value' => 0,
     '#required' => false,
   );
 
   return system_settings_form($form);
 }
+*/
 
 // ************************************* Menus *************************** //
+// See Section 4.5 / Audit Events AU-3 and AU-3.2 of the DOC document.
 /**
  * Implements hook_menu_link_delete()
  */
 function nistdrupallogger_menu_link_delete( $link = NULL ){
 
-  if ( is_array($link) ){
-
-    return logMenuAction($link, 'DELETED');
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO DELETE A LINK WITH A MALFORMED ARGUMENT.");
-    return false;
-  }
+  return logMenuAction($link, 'DELETED');
 }
 
 /**
@@ -90,15 +115,7 @@ function nistdrupallogger_menu_link_delete( $link = NULL ){
  */
 function nistdrupallogger_menu_link_insert($link = NULL){
 
-  if ( is_array( $link ) ) {
-
-    return logMenuAction( $link, 'INSERTED' );
-
-  }else{
-
-    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO INSERT A LINK WITH A MALFORMED ARGUMENT.");
-    return false;
-  }
+  return logMenuAction( $link, 'INSERTED' );
 }
 
 /**
@@ -106,15 +123,7 @@ function nistdrupallogger_menu_link_insert($link = NULL){
  */
 function nistdrupallogger_menu_link_update($link = NULL){
 
-  if ( is_array( $link ) ) {
-
-    return logMenuAction($link, 'UPDATED');
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. SOMEONE TRIED TO UPDATE A LINK WITH A MALFORMED ARGUMENT.");
-    return false;
-  }
+  return logMenuAction($link, 'UPDATED');
 }
 
 /**
@@ -125,33 +134,25 @@ function nistdrupallogger_menu_link_update($link = NULL){
  */
 function logMenuAction($link, $action){
 
-  if(variable_get(NIST_DRUPAL_LOGGER_MENU_FIELD_NAME) === 1 ) {
+  if(is_array($link) && isset($link['menu_name']) && isset($link['link_title'])){
 
     $message = 'The Menu: ' . $link['menu_name'] . ' link: '. $link['link_title'] . ' was ' . $action;
     return writeLogMessage($message);
 
   } else {
 
-    return false;
+    writeLogMessage(NISTDrupalLoggerWarningPrefix . ' Someone tried to perform link modifications (' . $action .') with malformed or no arguments.');
   }
-
 }
 
 // ************************************* Fields **************************** //
+// See Section 4.5 / See section Audit Events AU-2 and AU-2.3 of the DOC document.
 /**
  * Implements hook_field_update_field().
  */
 function nistdrupallogger_field_update_field( $field = NULL, $prior_field = NULL, $has_data = NULL){
 
-  if ( is_array($field) ){
-
-    return logFieldAction($field['field_name'], 'UPDATED');
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to update a field with malformed arguments.");
-    return false;
-  }
+  return logFieldAction( $field, 'UPDATED');
 }
 
 /**
@@ -159,16 +160,7 @@ function nistdrupallogger_field_update_field( $field = NULL, $prior_field = NULL
  */
 function nistdrupallogger_field_delete_field( $field = NULL ){
 
-
-  if ( is_array($field) ) {
-
-    return logFieldAction($field['field_name'], 'DELETED');
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to delete a field with malformed arguments.");
-    return false;
-  }
+  return logFieldAction($field, 'DELETED');
 }
 
 /**
@@ -176,51 +168,39 @@ function nistdrupallogger_field_delete_field( $field = NULL ){
  */
 function nistdrupallogger_field_create_field( $field = NULL ){
 
-  if ( is_array($field) ) {
-
-    return logFieldAction($field['field_name'], 'CREATED');
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Someone tried to create a field with malformed arguments.");
-    return false;
-  }
+  return logFieldAction($field, 'CREATED');
 }
 
 /**
  * I log what action was taken on a field
- * @param $fieldName - I am the name of the filed
+ * @param $field - I am the field object. I am required.
  * @param $action - I am what action took place
  * @return bool - whether the log entry was put in the log file or not
  */
-function logFieldAction($fieldName, $action){
+function logFieldAction($field, $action){
 
-  if(variable_get(NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME) === 1){
+  if( is_array($field) && isset($field['field_name']) ) {
 
-    $message = 'The Field: ' . $fieldName . ' was '. $action;
+    $message = 'The Field: ' . $field['field_name'] . ' was '. $action;
 
     return writeLogMessage($message);
+
   } else {
+
+    writeLogMessage(NISTDrupalLoggerWarningPrefix . 'An attempt to modify ('. $action .') a field failed because of malformed arguments.');
 
     return false;
   }
 }
 
-// ************************************* Modules *************************** //
+// ************************************* Modules **************************** //
+// See Section 4.5 / See section Audit Events AU-2 and AU-2.3 of the DOC document.
 /**
  * Implements hook_modules_enabled()
  */
 function nistdrupallogger_modules_enabled($modules = NULL){
 
-  if (is_array($modules)){
-
-    return logModuleAction($modules, "ENABLED");
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Failed enable modules because malformed arguments.");
-    return false;
-  }
+  return logModuleAction($modules, "ENABLED");
 }
 
 /**
@@ -228,16 +208,7 @@ function nistdrupallogger_modules_enabled($modules = NULL){
  */
 function nistdrupallogger_modules_disabled($modules = NULL){
 
-  if ( is_array($modules) ){
-
-    return logModuleAction($modules, "DISABLED");
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Failed Disabled modules because malformed arguments.");
-    return false;
-  }
-
+  return logModuleAction($modules, "DISABLED");
 }
 
 /**
@@ -245,15 +216,7 @@ function nistdrupallogger_modules_disabled($modules = NULL){
  */
 function nistdrupallogger_modules_installed($modules = NULL){
 
-  if ( is_array($modules) ) {
-
-    return logModuleAction($modules, "INSTALLED");
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Failed Install modules because malformed arguments.");
-    return false;
-  }
+  return logModuleAction($modules, "INSTALLED");
 }
 
 /**
@@ -261,15 +224,7 @@ function nistdrupallogger_modules_installed($modules = NULL){
  */
 function nistdrupallogger_modules_uninstalled($modules = NULL){
 
-  if ( is_array($modules) ) {
-
-    return logModuleAction($modules, "UNINSTALLED");
-
-  } else {
-
-    writeLogMessage("NIST DRUPAL LOGGER. Failed Uninstall modules a field malformed arguments.");
-    return false;
-  }
+  return logModuleAction($modules, "UNINSTALLED");
 }
 
 /**
@@ -280,18 +235,28 @@ function nistdrupallogger_modules_uninstalled($modules = NULL){
  */
 function logModuleAction($modules, $action){
 
-  $message = 'Nothing was logged. NISTDrupalLogger logModuleAction() method.';
+  if( is_array($modules) && count($modules) === 0 ){
 
-  if (variable_get(NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME) === 1){
+    writeLogMessage(NISTDrupalLoggerWarningPrefix . 'An attempt to modify ('. $action .') modules or a module failed because of malformed arguments. An array with no elements.');
 
-    if (count($modules) > 1){
+    return false;
+  }
 
-      $message = 'The modules: "'. implode(',', $modules) .'" have been ' . strtoupper($action);
+  if( !is_array($modules) ){
 
-    } else {
+    writeLogMessage(NISTDrupalLoggerWarningPrefix . 'An attempt to modify ('. $action .') modules or a module failed because of malformed arguments.');
 
-      $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
-    }
+    return false;
+  }
+
+  if ( count($modules) > 1 ){
+
+    $message = 'The modules: "'. implode(',', $modules) .'" have been ' . strtoupper($action);
+
+  } else {
+
+    $message = 'The module: "'. implode(',', $modules) .'" has been ' . strtoupper($action);
+
   }
 
   return writeLogMessage($message);
@@ -473,14 +438,4 @@ function getDefaultLogEntry(){
       'logOrigin' => $loggerName
     )
   );
-}
-
-/**
- * I dump a value for debugging.
- * @param $value - I am the value to dump.
- */
-function doDump($value){
-  print '<pre><code>';
-  print_r($value);
-  print '</code></pre>';
 }

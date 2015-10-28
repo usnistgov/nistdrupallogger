@@ -1,0 +1,133 @@
+<?php
+class NISTDrupalLoggerModuleTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'NISTDrupalLogger Module Unit Tests',
+      'description' => 'Test that nistdrupallogger module functions are logging  and reporting properly.',
+      'group' => 'NIST Drupal Logger'
+    );
+
+  }
+
+  /**
+   * I set up the class to be used for testing.
+   */
+  function setUp() {
+    // inject dependencies
+    parent::setUp('nistdrupallogger', 'syslog');
+
+  }
+
+  // MODULE enabled
+  public function testNistDrupalLoggerModuleEnabled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_enabled( $module );
+    $message = 'Module ENABLE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleEnabledFailZeroElements() {
+    $argument = array();
+    $result = nistdrupallogger_modules_enabled($argument);
+    $message = 'Module ENABLE FAIL. I should return FALSE. Array with 0 elements passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleEnabledFailBadArguments() {
+    $argument = false;
+    $result = nistdrupallogger_modules_enabled($argument);
+    $message = 'Module ENABLE FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleEnabledFailNoArgument() {
+    $result = nistdrupallogger_modules_enabled();
+    $message = 'Module ENABLE FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  // MODULE disabled
+  public function testNistDrupalLoggerModuleDisable() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_disabled( $module );
+    $message = 'Module DISABLE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleDisableFailZeroElements() {
+    $argument = array();
+    $result = nistdrupallogger_modules_disabled($argument);
+    $message = 'Module DISABLE FAIL. I should return FALSE. Zero elements passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleDisableFailBadArguments() {
+    $argument = 'phat';
+    $result = nistdrupallogger_modules_disabled($argument);
+    $message = 'Module DISABLE FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleDisableFailNoArguments() {
+    $result = nistdrupallogger_modules_disabled();
+    $message = 'Module DISABLE FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  // MODULE installed
+  public function testNistDrupalLoggerModuleInstalled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_installed( $module );
+    $message = 'Module INSTALLED. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleInstalledFailZeroElement() {
+    $argument = array();
+    $result = nistdrupallogger_modules_installed($argument);
+    $message = 'Module INSTALLED FAIL. I should return FALSE. Zero elements passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleInstalledFailBadArgument() {
+    $argument = false;
+    $result = nistdrupallogger_modules_installed($argument);
+    $message = 'Module INSTALLED FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleInstalledFailNoArgument() {
+    $result = nistdrupallogger_modules_installed();
+    $message = 'Module INSTALLED FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  // MODULE uninstalled
+  public function testNistDrupalLoggerModuleUninstalled() {
+    $module = array(
+      'foo',
+      'bar'
+    );
+    $result = nistdrupallogger_modules_uninstalled( $module );
+    $message = 'Module UNINSTALLED. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerModuleUninstalledFailZeroElements() {
+    $argument = array();
+    $result = nistdrupallogger_modules_uninstalled($argument);
+    $message = 'Module UNINSTALLED FAIL. I should return FALSE. Zero elements passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleUninstalledFailBadArgument() {
+    $argument = 'string';
+    $result = nistdrupallogger_modules_uninstalled($argument);
+    $message = 'Module UNINSTALLED FAIL. I should return FALSE. Bad argument passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerModuleUninstalledFailNoArgument() {
+    $result = nistdrupallogger_modules_uninstalled();
+    $message = 'Module UNINSTALLED FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+}

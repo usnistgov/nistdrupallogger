@@ -1,0 +1,96 @@
+<?php
+class NISTDrupalLoggerMenuTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'NISTDrupalLogger Menu Unit Tests',
+      'description' => 'Test that nistdrupallogger menu functions are logging  and reporting properly.',
+      'group' => 'NIST Drupal Logger'
+    );
+
+  }
+
+  /**
+   * I set up the class to be used for testing.
+   */
+  function setUp() {
+    // inject dependencies
+    parent::setUp('nistdrupallogger', 'syslog');
+
+  }
+
+  // MENU Delete
+  public function testNistDrupalLoggerMenuLinkDelete() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_delete( $link );
+    $message = 'Menu Link DELETE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkDeleteFail() {
+    $result = nistdrupallogger_menu_link_delete();
+    $message = 'Menu Link DELETE FAIL. I should return FALSE. I passed NO arguments.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkDeleteFailWrongArguments() {
+    $borkedLink = array(
+      'foo' => 'bar',
+      'baz' => 'wildChild'
+    );
+    $result = nistdrupallogger_menu_link_delete($borkedLink);
+    $message = 'Menu Link DELETE FAIL. I should return FALSE. I passed incorrect arguments.';
+    $this->assertFalse($result, $message);
+  }
+
+  // MENU Insert
+  public function testNistDrupalLoggerMenuLinkInsert() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_insert( $link );
+    $message = 'Menu Link INSERT. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkInsertFail() {
+    $result = nistdrupallogger_menu_link_insert();
+    $message = 'Menu link INSERT FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkInsertFailWrongArguments() {
+    $link = array(
+      'scooby' => 'doo',
+      'link_title' => 'this test should fail.'
+    );
+    $result = nistdrupallogger_menu_link_insert();
+    $message = 'Menu link INSERT FAIL. I should return FALSE. Incorrect arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+
+  // MENU Update
+  public function testNistDrupalLoggerMenuLinkUpdate() {
+    $link = array(
+      'menu_name' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_update( $link );
+    $message = 'Menu link UPDATE. I should return TRUE.';
+    $this->assertTrue($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkUpdateFailBadArguments() {
+    $link = array(
+      'noNoggenName' => 'FOO',
+      'link_title' => 'NIST DRUPAL LOGGER TEST ENTRY'
+    );
+    $result = nistdrupallogger_menu_link_update();
+    $message = 'Menu link UPDATE FAIL. I should return FALSE. Bad arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+  public function testNistDrupalLoggerMenuLinkUpdateFail() {
+    $result = nistdrupallogger_menu_link_update();
+    $message = 'Menu link UPDATE FAIL. I should return FALSE. No arguments passed.';
+    $this->assertFalse($result, $message);
+  }
+}
