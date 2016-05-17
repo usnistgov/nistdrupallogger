@@ -5,8 +5,7 @@
  *
  * Requirements are derived from:
  * https://connection.commerce.gov/sites/connection.commerce.gov/files/2014_doc_itspp.pdf.
- * See section 4.5 (starting on page 38) of the DoC IT Security Program Policy
- * (ITSPP)
+ * See section 4.5 (starting on page 38) of the above document.
  *
  * Propose:
  * Drupals' base line logging covers most of the FIPS requirements, failed login
@@ -28,77 +27,7 @@
  *    we desired to have the logger be as light weight as possible
  */
 
-/* Old configuration options - NOT used any more
-// define the field and variable names
-define('NIST_DRUPAL_LOGGER_MENU_FIELD_NAME', 'nistdrupallogger_menu_field');
-define('NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME', 'nistdrupallogger_field_field');
-define('NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME', 'nistdrupallogger_module_field');
-*/
-
 define('NISTDrupalLoggerWarningPrefix', 'NISTDRUPALLOGGER Warning!!');
-
-/*
-function nistdrupallogger_init(){
-  //dpm( 'is syslog there???' . (bool) module_exists('syslog'));
-}
-*/
-
-/**
- * Implements hook_menu().
- * Not used anymore will be removed in future release
- */
-/*
-function nistdrupallogger_menu(){
-
-  $items = array();
-
-  $items['admin/config/system/nistdrupallogger_logger'] = array(
-    'title' => 'NIST Drupal Logger',
-    'description' => 'Configuration for the NIST Drupal Logger',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('nistdrupallogger_logger_form'),
-    'access arguments' => array('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  return $items;
-}
-*/
-
-/**
- * Page callback: NIST Drupal Logger settings
- *
- * @see nistdrupallogger_menu()
- *
- * Not used anymore. Will be removed in future release. K
- */
-/*
-function nistdrupallogger_logger_form($form, &$form_state) {
-
-  $form[NIST_DRUPAL_LOGGER_MENU_FIELD_NAME] = array(
-    '#type' => 'checkbox',
-    '#title' => t( 'Log Menu Changes' ),
-    '#default_value' => 0,
-    '#required' => false,
-  );
-
-  $form[NIST_DRUPAL_LOGGER_FIELD_FIELD_NAME] = array(
-    '#type' => 'checkbox',
-    '#title' => t( 'Log Field Changes' ),
-    '#default_value' => 0,
-    '#required' => false,
-  );
-
-  $form[NIST_DRUPAL_LOGGER_MODULE_FIELD_NAME] = array(
-    '#type' => 'checkbox',
-    '#title' => t( 'Log Module Changes' ),
-    '#default_value' => 0,
-    '#required' => false,
-  );
-
-  return system_settings_form($form);
-}
-*/
 
 // ************************************* Menus *************************** //
 // See Section 4.5 / Audit Events AU-3 and AU-3.2 of the DOC document.
