@@ -285,9 +285,13 @@ function writeLogMessage($message = '', $logEntry = NULL){
     $doLog = true;
   }
 
-  if ( (bool) module_exists('syslog') && $doLog) {
+  // TODO: we need to rethink this. we should ALWAYS use watchdog only, and not
+  // check for the existance of syslog...
+  //if ( (bool) module_exists('syslog') && $doLog) {
 
-    syslog_watchdog($entryForSysLog);
+  if ( $doLog ) {
+
+    watchdog('NOTICE', $message);
     $doLog = true;
 
   } else {
