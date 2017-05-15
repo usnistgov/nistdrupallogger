@@ -1,3 +1,11 @@
+#This Git repository is no longer maintained.
+
+Please see [FIPS Logger](https://github.com/usnistgov/fips_logger) for further information about a FIPS compliant logging module for Drupal.
+
+##ALL DEVELOPMENT IN THIS REPOSITORY WILL STOP.
+
+
+
 #nistdrupallogger
 
 ## Synopsis
