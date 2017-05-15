@@ -275,7 +275,7 @@ function writeLogMessage($message = '', $logEntry = NULL){
   // are we getting a full log entry array? or just a message to log?
   if (isset($logEntry)){
 
-    $entryForSysLog =  $logEntry;
+    $entryForSysLog = $logEntry;
     $doLog = true;
 
   } elseif (strlen($message)){ // just the message to log.

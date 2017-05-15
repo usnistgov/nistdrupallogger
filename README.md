@@ -1,10 +1,10 @@
-# This Git repository is no longer maintained.
+# THIS GIT REPOSITORY IS NO LONGER MAINTAINED.
 
 Please see [FIPS Logger](https://github.com/usnistgov/fips_logger) for further information about a FIPS compliant logging module for Drupal.
 
 ## ALL DEVELOPMENT IN THIS REPOSITORY WILL STOP.
 
-## Synopsis
+### Old Synopsis
 
 Requirements are derived from:
 [Department of Commerce
@@ -21,7 +21,7 @@ Drupals' base line logging covers most of the FIPS requirements, failed login at
 Those have been incorporated into this logger.
 
 
-## Installation
+### Installation
 
 Disable database logging and enable system logging and this module. Thats it. No other configuration is needed.
 
